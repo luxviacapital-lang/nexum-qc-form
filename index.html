@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexum Service Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #9A7A35;
+    --black: #0A0A0A;
+    --black-mid: #111111;
+    --black-soft: #1A1A1A;
+    --black-card: #141414;
+    --border: rgba(201,168,76,0.18);
+    --border-hover: rgba(201,168,76,0.5);
+    --text: #E8E0D0;
+    --text-muted: rgba(232,224,208,0.5);
+    --radius: 2px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* Gold top bar */
+  .top-bar {
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold-dim) 20%, var(--gold-light) 50%, var(--gold-dim) 80%, transparent 100%);
+    position: relative;
+    z-index: 10;
+  }
+
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeDown 0.8s ease forwards;
+    opacity: 0;
+  }
+
+  .logo-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .logo-x {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 600;
+    background: linear-gradient(145deg, #8B6914 0%, #C9A84C 35%, #F0D98A 55%, #C9A84C 75%, #8B6914 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+
+  .logo-divider {
+    width: 1px;
+    height: 44px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  }
+
+  .logo-text-block { text-align: left; }
+
+  .logo-name {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    color: #D4D4D4;
+    line-height: 1.1;
+  }
+
+  .logo-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .header-rule::before, .header-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+
+  .header-rule::after {
+    background: linear-gradient(90deg, var(--gold-dim), transparent);
+  }
+
+  .header-rule span {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .header p {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  /* Form */
+  form { display: flex; flex-direction: column; gap: 20px; }
+
+  .field-card {
+    background: var(--black-card);
+    border: 1px solid var(--border);
+    padding: 28px 28px 24px;
+    position: relative;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeUp 0.6s ease forwards;
+    opacity: 0;
+  }
+
+  .field-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 40px rgba(201,168,76,0.05);
+  }
+
+  /* Corner accents */
+  .field-card::before, .field-card::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--gold-dim);
+    border-style: solid;
+    transition: border-color 0.3s;
+  }
+
+  .field-card::before {
+    top: -1px; left: -1px;
+    border-width: 1px 0 0 1px;
+  }
+
+  .field-card::after {
+    bottom: -1px; right: -1px;
+    border-width: 0 1px 1px 0;
+  }
+
+  .field-card:hover::before,
+  .field-card:hover::after {
+    border-color: var(--gold);
+  }
+
+  .field-number {
+    position: absolute;
+    top: -1px;
+    right: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    background: var(--black-card);
+    padding: 0 8px;
+    transform: translateY(-50%);
+    border: 1px solid var(--border);
+  }
+
+  .field-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .required-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .field-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .field-hint {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  /* Inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    border-radius: var(--radius);
+    letter-spacing: 0.5px;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  textarea:focus {
+    border-color: var(--gold-dim);
+    border-bottom-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+
+  input[type="text"]::placeholder,
+  input[type="email"]::placeholder,
+  input[type="tel"]::placeholder,
+  textarea::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 12px;
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  /* Radio / Checkbox options */
+  .options-grid { display: flex; flex-direction: column; gap: 10px; }
+
+  .option-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: transparent;
+  }
+
+  .option-item:hover {
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .option-item input { display: none; }
+
+  .option-item input:checked ~ .option-box {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .option-item input:checked ~ .option-box::after {
+    opacity: 1;
+  }
+
+  .option-item:has(input:checked) {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  .option-box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gold-dim);
+    flex-shrink: 0;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .option-box.circle { border-radius: 50%; }
+
+  .option-box::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--black);
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: inherit;
+  }
+
+  .option-box.circle::after { border-radius: 50%; }
+
+  .option-text {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text);
+    font-weight: 400;
+    flex: 1;
+  }
+
+  /* Urgency special styling */
+  .urgency-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .urgency-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .urgency-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.25s;
+  }
+
+  .urgency-item.u-high::before { background: #C0392B; }
+  .urgency-item.u-med::before { background: var(--gold); }
+  .urgency-item.u-low::before { background: #2ECC71; }
+
+  .urgency-item input { display: none; }
+
+  .urgency-item:has(input:checked) {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .urgency-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .urgency-item.u-high .urgency-dot { background: #C0392B; box-shadow: 0 0 8px rgba(192,57,43,0.5); }
+  .urgency-item.u-med .urgency-dot { background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+  .urgency-item.u-low .urgency-dot { background: #2ECC71; box-shadow: 0 0 8px rgba(46,204,113,0.3); }
+
+  .urgency-text-wrap { flex: 1; }
+
+  .urgency-label {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    font-weight: 500;
+    text-transform: uppercase;
+    display: block;
+  }
+
+  .urgency-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* Other input */
+  .other-input-wrap {
+    display: none;
+    margin-top: 12px;
+    animation: fadeUp 0.3s ease forwards;
+  }
+
+  .other-input-wrap.visible { display: block; }
+
+  /* File upload */
+  .file-upload-zone {
+    border: 1px dashed rgba(201,168,76,0.3);
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .file-upload-zone:hover {
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.03);
+  }
+
+  .file-upload-zone.has-file {
+    border-style: solid;
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .file-upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    opacity: 0.6;
+  }
+
+  .upload-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .upload-hint {
+    font-size: 10px;
+    color: rgba(201,168,76,0.5);
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+
+  .file-name-display {
+    font-size: 11px;
+    color: var(--gold);
+    margin-top: 10px;
+    letter-spacing: 1px;
+    display: none;
+  }
+
+  /* Submit button */
+  .submit-wrap {
+    padding-top: 12px;
+    animation: fadeUp 0.6s 0.8s ease forwards;
+    opacity: 0;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 18px 32px;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.05));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .submit-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+    box-shadow: 0 0 30px rgba(201,168,76,0.15), inset 0 0 30px rgba(201,168,76,0.05);
+  }
+
+  .submit-btn:hover::before { opacity: 1; }
+
+  .submit-btn:active { transform: scale(0.99); }
+
+  /* Footer note */
+  .form-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    animation: fadeUp 0.6s 1s ease forwards;
+    opacity: 0;
+  }
+
+  /* Success screen */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 24px;
+    animation: fadeIn 0.8s ease forwards;
+  }
+
+  .success-screen.visible { display: block; }
+
+  .success-emblem {
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    position: relative;
+  }
+
+  .success-emblem::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .success-emblem svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--gold);
+    stroke-width: 1.5;
+  }
+
+  .success-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 auto 28px;
+    max-width: 300px;
+  }
+
+  .success-rule::before, .success-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+
+  .success-rule::after {
+    background: linear-gradient(90deg, var(--gold-dim), transparent);
+  }
+
+  .success-rule span {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: var(--gold);
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  .success-message {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-muted);
+    max-width: 380px;
+    margin: 0 auto 32px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  .success-message strong {
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .success-badge {
+    display: inline-block;
+    border: 1px solid var(--border);
+    padding: 10px 24px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .field-card:nth-child(1) { animation-delay: 0.1s; }
+  .field-card:nth-child(2) { animation-delay: 0.2s; }
+  .field-card:nth-child(3) { animation-delay: 0.3s; }
+  .field-card:nth-child(4) { animation-delay: 0.4s; }
+  .field-card:nth-child(5) { animation-delay: 0.5s; }
+  .field-card:nth-child(6) { animation-delay: 0.6s; }
+  .field-card:nth-child(7) { animation-delay: 0.7s; }
+
+  @media (max-width: 480px) {
+    .page-wrap { padding: 40px 16px 60px; }
+    .header h1 { font-size: 28px; }
+    .logo-name { font-size: 18px; }
+    .field-card { padding: 22px 18px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="page-wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-line">
+      <div class="logo-x">✕</div>
+      <div class="logo-divider"></div>
+      <div class="logo-text-block">
+        <div class="logo-name">NEXUM</div>
+        <div class="logo-sub">Contracting Systems, LLC</div>
+      </div>
+    </div>
+    <div class="header-rule"><span>◆</span></div>
+    <h1>Service Feedback</h1>
+    <p>Your report helps us maintain the standard</p>
+  </div>
+
+  <!-- Form -->
+  <form id="feedbackForm" novalidate>
+
+    <!-- 1. Location -->
+    <div class="field-card">
+      <div class="field-number">01</div>
+      <div class="field-label"><span class="required-dot"></span>Location / Property</div>
+      <div class="field-question">Where was this service performed?</div>
+      <input type="text" name="location" placeholder="Property or facility name" required>
+    </div>
+
+    <!-- 2. Issue Type -->
+    <div class="field-card">
+      <div class="field-number">02</div>
+      <div class="field-label"><span class="required-dot"></span>What Needs Attention</div>
+      <div class="field-question">What can we improve or correct?</div>
+      <div class="options-grid" id="issueOptions">
+        <label class="option-item">
+          <input type="radio" name="issue" value="Area missed">
+          <div class="option-box"></div>
+          <span class="option-text">Area missed</span>
+        </label>
+        <label class="option-item">
+          <input type="radio" name="issue" value="Not cleaned to standard">
+          <div class="option-box"></div>
+          <span class="option-text">Not cleaned to standard</span>
+        </label>
+        <label class="option-item">
+          <input type="radio" name="issue" value="Supplies need restocking">
+          <div class="option-box"></div>
+          <span class="option-text">Supplies need restocking</span>
+        </label>
+        <label class="option-item">
+          <input type="radio" name="issue" value="General feedback">
+          <div class="option-box"></div>
+          <span class="option-text">General feedback</span>
+        </label>
+        <label class="option-item" id="otherRadioLabel">
+          <input type="radio" name="issue" value="Other" id="otherRadio">
+          <div class="option-box"></div>
+          <span class="option-text">Other</span>
+        </label>
+        <div class="other-input-wrap" id="otherInputWrap">
+          <input type="text" name="issue_other" placeholder="Please specify…">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Description -->
+    <div class="field-card">
+      <div class="field-number">03</div>
+      <div class="field-label">Description</div>
+      <div class="field-question">Briefly describe the issue</div>
+      <div class="field-hint">Optional — but even a brief note accelerates resolution.</div>
+      <textarea name="description" placeholder="Describe what you observed…"></textarea>
+    </div>
+
+    <!-- 4. Urgency -->
+    <div class="field-card">
+      <div class="field-number">04</div>
+      <div class="field-label"><span class="required-dot"></span>Urgency Level</div>
+      <div class="field-question">How urgent is this?</div>
+      <div class="urgency-options">
+        <label class="urgency-item u-high">
+          <input type="radio" name="urgency" value="Immediate attention needed" required>
+          <div class="urgency-dot"></div>
+          <div class="urgency-text-wrap">
+            <span class="urgency-label">Immediate Attention Needed</span>
+            <span class="urgency-sub">Requires response as soon as possible</span>
+          </div>
+        </label>
+        <label class="urgency-item u-med">
+          <input type="radio" name="urgency" value="Within 24 hours">
+          <div class="urgency-dot"></div>
+          <div class="urgency-text-wrap">
+            <span class="urgency-label">Within 24 Hours</span>
+            <span class="urgency-sub">Should be addressed by next service day</span>
+          </div>
+        </label>
+        <label class="urgency-item u-low">
+          <input type="radio" name="urgency" value="Not urgent">
+          <div class="urgency-dot"></div>
+          <div class="urgency-text-wrap">
+            <span class="urgency-label">Not Urgent</span>
+            <span class="urgency-sub">General note for the team</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- 5. Photo Upload -->
+    <div class="field-card">
+      <div class="field-number">05</div>
+      <div class="field-label">Photo Documentation</div>
+      <div class="field-question">Add a photo (optional)</div>
+      <div class="field-hint">Eliminates back-and-forth — your team sees exactly what needs attention.</div>
+      <div class="file-upload-zone" id="uploadZone">
+        <input type="file" name="photo" accept="image/*" id="photoInput">
+        <div class="upload-icon">⬆</div>
+        <span class="upload-label">Tap to attach photo</span>
+        <span class="upload-hint">JPG, PNG, HEIC accepted</span>
+        <div class="file-name-display" id="fileNameDisplay"></div>
+      </div>
+    </div>
+
+    <!-- 6. Contact Name -->
+    <div class="field-card">
+      <div class="field-number">06</div>
+      <div class="field-label">Contact Name</div>
+      <div class="field-question">Your name</div>
+      <input type="text" name="contact_name" placeholder="First and last name">
+    </div>
+
+    <!-- 7. Contact Info -->
+    <div class="field-card">
+      <div class="field-number">07</div>
+      <div class="field-label">Contact Information</div>
+      <div class="field-question">Phone or email (if you'd like a response)</div>
+      <input type="text" name="contact_info" placeholder="Phone number or email address">
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-wrap">
+      <button type="submit" class="submit-btn">Submit Feedback</button>
+    </div>
+
+    <div class="form-footer">Nexum Contracting Systems — Quality Assurance Division</div>
+
+  </form>
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-emblem">
+      <svg viewBox="0 0 24 24" fill="none">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <div class="success-rule"><span>✦</span></div>
+    <h2 class="success-title">Thank You.</h2>
+    <p class="success-message">
+      Your feedback has been received and is being reviewed.<br>
+      <strong>If marked urgent, our team will respond promptly.</strong><br><br>
+      We appreciate your commitment to maintaining the standard.
+    </p>
+    <div class="success-badge">Nexum Contracting Systems</div>
+  </div>
+
+</div>
+
+<script>
+  // Other option toggle
+  const otherRadio = document.getElementById('otherRadio');
+  const otherInputWrap = document.getElementById('otherInputWrap');
+  const issueOptions = document.getElementById('issueOptions');
+
+  issueOptions.addEventListener('change', (e) => {
+    if (e.target.name === 'issue') {
+      otherInputWrap.classList.toggle('visible', e.target.value === 'Other');
+    }
+  });
+
+  // File upload display
+  const photoInput = document.getElementById('photoInput');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  const uploadZone = document.getElementById('uploadZone');
+
+  photoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      fileNameDisplay.textContent = '✓ ' + file.name;
+      fileNameDisplay.style.display = 'block';
+      uploadZone.classList.add('has-file');
+    }
+  });
+
+  // Form submit
+  document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const location = form.location.value.trim();
+    const issue = form.querySelector('input[name="issue"]:checked');
+    const urgency = form.querySelector('input[name="urgency"]:checked');
+
+    if (!location) {
+      form.location.focus();
+      form.location.style.borderColor = '#C0392B';
+      setTimeout(() => form.location.style.borderColor = '', 2000);
+      return;
+    }
+
+    if (!issue) {
+      form.querySelector('.options-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    if (!urgency) {
+      form.querySelector('.urgency-options').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Disable button during submission
+    const btn = form.querySelector('.submit-btn');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    // Build form data for Web3Forms
+    const issueValue = issue.value === 'Other'
+      ? (form.issue_other?.value || 'Other')
+      : issue.value;
+
+    const payload = {
+      access_key: '33aa60cb-bd2f-4643-9dec-473e5c7a27c7',
+      subject: `[Nexum Feedback] ${urgency.value} — ${location}`,
+      from_name: 'Nexum QC Form',
+      location: location,
+      issue: issueValue,
+      description: form.description.value || 'No description provided',
+      urgency: urgency.value,
+      contact_name: form.contact_name.value || 'Not provided',
+      contact_info: form.contact_info.value || 'Not provided',
+    };
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        form.style.display = 'none';
+        document.querySelector('.header').style.display = 'none';
+        const success = document.getElementById('successScreen');
+        success.classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        btn.textContent = 'Submission Failed — Try Again';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.borderColor = '#C0392B';
+        btn.style.color = '#C0392B';
+      }
+    } catch (err) {
+      btn.textContent = 'Network Error — Try Again';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.borderColor = '#C0392B';
+      btn.style.color = '#C0392B';
+    }
+  });
+</script>
+</body>
+</html>
